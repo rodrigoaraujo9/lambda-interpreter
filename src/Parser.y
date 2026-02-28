@@ -35,30 +35,30 @@ import Ast
 
 Term :: { Term }
 Term
-    : let var '=' Term in Term { TLet $2 $4 $6 }
-    | lambda var '.' Term { TLambda $2 $4 }
-    | '\\' var '.' Term { TLambda $2 $4 }
-    | fix Term { TFix $2 }
-    | if Var iszero Term then Term else Term { TIf $3 $5 $7 }
-    | ArithmeticTerm { $1 }
+    : let var '=' Term in Term           { Let $2 $4 $6 }
+    | lambda var '.' Term                { Lambda $2 $4 }
+    | '\\' var '.' Term                  { Lambda $2 $4 }
+    | fix Term                           { Fix $2 }
+    | if iszero Term then Term else Term { IfZero $3 $5 $7 }
+    | ArithmeticTerm                     { $1 }
 
 ArithmeticTerm :: { Term }
 ArithmeticTerm
-    : ArithmeticTerm '+' ArithmeticTerm { TPlus $1 $3 }
-    | ArithmeticTerm '-' ArithmeticTerm { TMinus $1 $3 }
-    | ArithmeticTerm '*' ArithmeticTerm { TTimes $1 $3 }
-    | ApplicationTerm { $1 }
+    : ArithmeticTerm '+' ArithmeticTerm  { $1 :+ $3 }
+    | ArithmeticTerm '-' ArithmeticTerm  { $1 :- $3 }
+    | ArithmeticTerm '*' ArithmeticTerm  { $1 :* $3 }
+    | ApplicationTerm                    { $1 }
 
 ApplicationTerm :: { Term }
 ApplicationTerm
-    : ApplicationTerm ApplicationTerm { TApp $1 $2 }
-    | AtomicTerm { $1 }
+    : ApplicationTerm AtomicTerm         { App $1 $2 }
+    | AtomicTerm                         { $1 }
 
 AtomicTerm :: { Term }
 AtomicTerm
-    : int { TInt $1 }
-    | var { TVar $1 }
-    | '(' Term ')' { $2 }
+    : int                                { Const $1 }
+    | var                                { Var $1 }
+    | '(' Term ')'                       { $2 }
 
 {
 parseError :: [Token] -> a
