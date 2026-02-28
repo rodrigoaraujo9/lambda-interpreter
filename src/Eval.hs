@@ -3,20 +3,15 @@
 module Eval where
 import Ast
 
--- still need to make everything strict so it is actually applicative order
--- use ! or 'seq'
---
-
 eval :: Term -> Term
 eval (Const n)    = Const n
 eval (Var _)      = error "free variable occurrence"
 eval (Lambda x e) = Lambda x e
-eval (App e1 e2)  =
-  let e1' = eval e1 in
-  case e1' of
-    Lambda x e ->
-      let e2' = eval e2
-      in eval (subst e2' x e)
+eval (App e1 e2) =
+  let !e1' = eval e1
+      !e2' = eval e2
+  in case e1' of
+    Lambda x e -> eval (subst e2' x e)
     _ -> error "application exception"
 eval (e1 :+ e2) =
   case (eval e1, eval e2) of
@@ -41,7 +36,6 @@ eval (Fix t) =
     Lambda x e -> eval (subst (Fix t) x e)
     _ -> error "fix exception"
 
-
 -- [v/x]e
 -- v substitutes x in e
 subst ::  Term -> Ident -> Term -> Term
@@ -61,8 +55,5 @@ subst v x (Let y e1 e2)
   | x == y    = Let y (subst v x e1) e2
   | otherwise = Let y (subst v x e1) (subst v x e2)
 subst v x (Fix e) = Fix (subst v x e)
-
-
--- $! makes funct strict -> must be evaluated
 
 -- happy for parser
