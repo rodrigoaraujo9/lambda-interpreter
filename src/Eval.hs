@@ -55,5 +55,3 @@ subst v x (Let y e1 e2)
   | x == y    = Let y (subst v x e1) e2
   | otherwise = Let y (subst v x e1) (subst v x e2)
 subst v x (Fix e) = Fix (subst v x e)
-
--- happy for parser
