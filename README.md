@@ -34,5 +34,7 @@ Then type an expression and press `Ctrl+D`.
 ## Example
 
 ```
-let f = fix (lambda f. lambda x. if iszero x then 1 else x * f (x - 1)) in f 5
+if iszero 0 then 99 else 5
+let twice = lambda f . lambda x . f (f x) in twice (lambda x . x + 1) 42
+let fact = fix lambda f . lambda n . if iszero n then 1 else n * f (n - 1) in fact 10
 ```
